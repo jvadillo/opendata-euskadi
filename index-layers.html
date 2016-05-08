@@ -84,6 +84,20 @@
                     }).setView([0, 0], 3);
 
                     markers = new L.MarkerClusterGroup();
+
+                    noticiasLayer = new L.LayerGroup();
+                    turismoLayer = new L.LayerGroup();
+                    culturaLayer = new L.LayerGroup();
+
+                    var overlays = {
+                        "Noticias": noticiasLayer,
+                        "Turismo" : turismoLayer,
+                        "Agenda cultural" : culturaLayer
+                    };
+
+                    L.control.layers(null, overlays).addTo(map);
+
+
                     map.addLayer(markers);
                 }
 
@@ -99,21 +113,34 @@
                         url = url + API_URL_CULTURA;
                     } else if (type == "turismo") {
                         url = url + API_URL_TURISMO;
+                    } else if (type == "noticias") {
+                        url = url + API_URL_NOTICIAS;
                     }
 
                     console.log(url);
                     if(url != null){
                         console.log("Loading data...");
                         $.getJSON( url, function( data ) {
-                            console.log("Data loaded.");
-                            drawData(data);
+                            console.log("Data loaded ("+type+").");
+                            drawData(data, type);
                         });
                     }
 
                     
                 }
 
-                function drawData(data){
+                function drawData(data, type){
+
+                    var layer;
+
+                    if(type == "cultura") {
+                        layer = culturaLayer;
+                    } else if (type == "turismo") {
+                        layer = turismoLayer;
+                    } else if (type == "noticias") {
+                        layer = noticiasLayer;
+                    }
+
                     $.each( data, function( key, val ) {
                             //var marker = L.marker([51.5, -0.09]).addTo(mymap);
                             var title = val.documentName;
@@ -123,7 +150,8 @@
                             var lon = latlonArr[1];
                             var m = createMarker(title, lat, lon);
                             //L.marker([lat, lon]).addTo(map);
-                            markers.addLayer(m);
+
+                            layer.addLayer(m);
                         });
                 }
 
@@ -135,6 +163,9 @@
 
                 initMap();
                 loadData("cultura");
+                loadData("noticias");
+                loadData("turismo");
+
 
                 //EVENTS:
                 $( "#event-type").change(function() {
