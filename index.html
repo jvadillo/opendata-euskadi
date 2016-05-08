@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.js"></script>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <link rel="stylesheet" href="./markercluster.css" />
+        <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        <script type="text/javascript" src="./markercluster.js"></script>
+        <style>
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            html, body, #map {
+                height: 100%;
+            }
+        </style>
+        <script type="text/javascript">
+            var features = [];
+            $(document).ready(function() {
+                var baseLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+                    maxZoom: 18
+                });
+
+                var API_URL = "https://crossorigin.me/http://opendata.euskadi.eus/contenidos/ds_eventos/eventos_turisticos/opendata/agenda.json";
+
+                
+
+                var baseLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+                    maxZoom: 18
+                });
+                var map = L.map('map', {
+                    layers: [baseLayer]
+                }).setView([0, 0], 3);
+
+                var markers = new L.MarkerClusterGroup();
+                map.addLayer(markers);
+
+                $.getJSON( API_URL, function( data ) {
+                    $.each( data, function( key, val ) {
+                        //var marker = L.marker([51.5, -0.09]).addTo(mymap);
+                        var title = val.documentName;
+                        var latlon = val.latitudelongitude;
+                        var latlonArr = latlon.split(',');
+                        var lat = latlonArr[0];
+                        var lon = latlonArr[1];
+                        var m = L.marker([lat, lon]);
+                        m.bindPopup(title);
+                        //L.marker([lat, lon]).addTo(map);
+                        markers.addLayer(m);
+                    });
+                     
+                      
+                });
+
+
+
+            });
+        </script>
+    </head>
+    <body>
+         <div id="map"></div>
+         <select data-placeholder="Tipos de eventos" class="news-combo" style="width: 300px;position: absolute;top: 12px;left: 50px;height: 50px !important;font-size: 25px;background-color: white;" tabindex="1">
+            <option value="bbc">Eventos</option>
+            <option value="cnn" selected="selected">Agenda cultural</option>
+         </select>
+    </body>
+</html>
